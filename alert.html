@@ -1,3 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Steushio Alert Overlay</title>
+
+<style>
+  body {
+    margin:0;
+    background:transparent;
+    overflow:hidden;
+    font-family:Arial, Helvetica, sans-serif;
+  }
+
+  #container {
+    position:absolute;
+    top:40%;
+    left:50%;
+    transform:translate(-50%, -50%) scale(0.8);
+    text-align:center;
+    opacity:0;
+    transition:all 0.4s ease;
+  }
+
+  #container.show {
+    opacity:1;
+    transform:translate(-50%, -50%) scale(1);
+  }
+
+  #gif {
+    max-width:300px;
+    margin-bottom:10px;
+    display:none;
+  }
+
+  #text {
+    background:rgba(0,0,0,0.75);
+    padding:16px 28px;
+    border-radius:16px;
+    font-size:28px;
+    color:white;
+    font-weight:bold;
+    box-shadow:0 0 30px rgba(255,255,255,0.2);
+  }
+</style>
+</head>
+
+<body>
+
+<div id="container">
+  <img id="gif">
+  <div id="text"></div>
+</div>
+
+<audio id="sound"></audio>
+
 <script>
 let lastEvent = null;
 
@@ -13,15 +69,16 @@ function getConfig() {
 
 async function poll() {
   try {
-    const r = await fetch("http://localhost:8000/latest");
-    const d = await r.json();
-    if (!d.name || !d.amount) return;
+    const res = await fetch("http://localhost:8000/latest");
+    const data = await res.json();
 
-    const key = JSON.stringify(d);
+    if (!data.name || !data.amount) return;
+
+    const key = JSON.stringify(data);
     if (key === lastEvent) return;
     lastEvent = key;
 
-    showAlert(d.name, d.amount);
+    showAlert(data.name, data.amount);
   } catch {}
 }
 
@@ -35,13 +92,16 @@ function showAlert(name, amount) {
   txt.innerHTML = cfg.text
     .replace("{name}", name)
     .replace("{amount}", amount);
+
   txt.style.fontSize = cfg.fontSize + "px";
   txt.style.color = cfg.color;
 
   if (cfg.gif) {
     gif.src = cfg.gif;
     gif.style.display = "block";
-  } else gif.style.display = "none";
+  } else {
+    gif.style.display = "none";
+  }
 
   if (cfg.sound) {
     snd.src = cfg.sound;
@@ -55,3 +115,6 @@ function showAlert(name, amount) {
 
 setInterval(poll, 2000);
 </script>
+
+</body>
+</html>
