@@ -6,23 +6,18 @@
 
 <style>
   body {
-    font-family: Arial;
-    background: #0b1020;
-    color: white;
-    padding: 30px;
+    background:#0b1020;
+    color:#fff;
+    font-family:Arial;
+    padding:30px;
   }
-
   label { display:block; margin-top:15px; }
-  input, button {
-    padding: 8px;
-    margin-top: 5px;
-    width: 320px;
+  select, input, button {
+    width:340px;
+    padding:8px;
+    margin-top:5px;
   }
-
-  button {
-    margin-top: 20px;
-    cursor: pointer;
-  }
+  button { margin-top:15px; cursor:pointer; }
 </style>
 </head>
 
@@ -40,16 +35,23 @@
 <label>Text Color</label>
 <input type="color" id="color" value="#ffffff">
 
-<label>Alert Sound (mp3/wav)</label>
-<input type="file" id="soundFile" accept="audio/*">
+<hr>
 
-<label>Alert GIF</label>
-<input type="file" id="gifFile" accept="image/gif">
+<label>Select Alert Sound</label>
+<select id="sound">
+  <option value="">None</option>
+  <option value="assets/sounds/coffee.mp3">Coffee</option>
+  <option value="assets/sounds/pop.mp3">Pop</option>
+  <option value="assets/sounds/bell.mp3">Bell</option>
+</select>
 
-<label>
-  <input type="checkbox" id="soundEnabled" checked>
-  Enable Sound
-</label>
+<label>Select Alert GIF</label>
+<select id="gif">
+  <option value="">None</option>
+  <option value="assets/gifs/hearts.gif">Hearts</option>
+  <option value="assets/gifs/coffee.gif">Coffee</option>
+  <option value="assets/gifs/glow.gif">Glow</option>
+</select>
 
 <button onclick="save()">Save Settings</button>
 <button onclick="preview()">Preview Alert</button>
@@ -60,33 +62,18 @@ function save() {
     text: text.value,
     fontSize: fontSize.value,
     color: color.value,
-    soundEnabled: soundEnabled.checked
+    sound: sound.value,
+    gif: gif.value
   };
-
   localStorage.setItem("alertConfig", JSON.stringify(cfg));
-
-  if (soundFile.files[0]) {
-    localStorage.setItem(
-      "alertSound",
-      URL.createObjectURL(soundFile.files[0])
-    );
-  }
-
-  if (gifFile.files[0]) {
-    localStorage.setItem(
-      "alertGif",
-      URL.createObjectURL(gifFile.files[0])
-    );
-  }
-
   alert("Saved! OBS will update instantly.");
 }
 
 function preview() {
   fetch("http://localhost:8000/webhook", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({name:"Test User", amount:100})
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ name:"Test User", amount:100 })
   });
 }
 </script>
