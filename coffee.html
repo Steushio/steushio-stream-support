@@ -9,6 +9,7 @@
       --bg: #0b0f1a;
       --card: #12172a;
       --accent: #7c4dff;
+      --accent2: #00d4ff;
       --text: #e6e9f2;
       --muted: #9aa3c7;
     }
@@ -30,60 +31,128 @@
       border-radius: 20px;
       padding: 32px;
       box-shadow: 0 25px 60px rgba(0,0,0,0.45);
-      text-align: center;
     }
-    h1 { margin: 0 0 10px; }
-    p { color: var(--muted); line-height: 1.6; }
+    h1 { margin: 0 0 16px; text-align:center; }
+    label { font-size:0.85rem; color:var(--muted); }
+    input {
+      width:100%;
+      margin-top:6px;
+      padding:12px 14px;
+      border-radius:12px;
+      border:none;
+      background:#0b0f1a;
+      color:var(--text);
+      font-size:0.95rem;
+    }
+    .amounts {
+      display:flex;
+      gap:12px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .amt-btn {
+      flex:1;
+      min-width:90px;
+      padding:12px 0;
+      border-radius:12px;
+      background:#0b0f1a;
+      border:1px solid #1f2645;
+      color:var(--text);
+      font-weight:600;
+      cursor:pointer;
+    }
+    .amt-btn.active { background:var(--accent); border-color:var(--accent); }
+    .pay {
+      margin-top:22px;
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:none;
+      background:linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#0b0f1a;
+      font-weight:700;
+      font-size:1rem;
+      cursor:pointer;
+    }
+    .qr-box {
+      display:none;
+      margin-top:24px;
+      text-align:center;
+    }
     .qr {
-      width: 240px;
-      height: 240px;
-      margin: 24px auto 12px;
-      background: #0b0f1a;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      font-size: 0.9rem;
+      width:240px;
+      height:240px;
+      margin:0 auto 10px;
+      background:#0b0f1a;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--muted);
     }
-    .upi {
-      font-weight: 600;
-      margin-top: 8px;
-    }
-    .note {
-      margin-top: 18px;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-    .back {
-      display: inline-block;
-      margin-top: 26px;
-      padding: 10px 16px;
-      border-radius: 12px;
-      background: #fff;
-      color: #0b0f1a;
-      text-decoration: none;
-      font-weight: 600;
-    }
+    .note { margin-top:10px; font-size:0.85rem; color:var(--muted); text-align:center; }
+    .back { display:block; text-align:center; margin-top:22px; color:var(--muted); text-decoration:none; }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>☕ Buy Me a Coffee</h1>
-    <p>
-      Enjoying the stream? You can support it with a coffee using direct UPI.
-      This support goes directly to the creator.
-    </p>
 
-    <div class="qr">PLACE YOUR UPI QR HERE</div>
-    <div class="upi">UPI ID: yourname@upi</div>
+    <label>Supporter Name</label>
+    <input id="name" placeholder="Your name" />
 
-    <div class="note">
-      After supporting, please type <strong>done</strong> in chat ❤️<br />
-      Your on-stream alert will play shortly.
+    <label style="margin-top:18px; display:block;">Select Amount</label>
+    <div class="amounts">
+      <button class="amt-btn" onclick="selectAmount(50)">₹50</button>
+      <button class="amt-btn" onclick="selectAmount(100)">₹100</button>
+      <button class="amt-btn" onclick="selectAmount(200)">₹200</button>
+      <button class="amt-btn" onclick="selectAmount('custom')">Custom</button>
+    </div>
+
+    <input id="customAmount" placeholder="Enter custom amount" style="display:none; margin-top:12px;" />
+
+    <button class="pay" onclick="showQR()">Pay</button>
+
+    <div class="qr-box" id="qrBox">
+      <div class="qr">PLACE YOUR UPI QR HERE</div>
+      
+      <div class="note">Thanks for supporting the stream ❤️</div>
     </div>
 
     <a href="index.html" class="back">← Back to home</a>
   </div>
+
+<script>
+  let selectedAmount = null;
+
+  function selectAmount(val) {
+    document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    if (val === 'custom') {
+      document.getElementById('customAmount').style.display = 'block';
+      selectedAmount = null;
+    } else {
+      document.getElementById('customAmount').style.display = 'none';
+      selectedAmount = val;
+    }
+  }
+
+  function showQR() {
+    const name = document.getElementById('name').value.trim();
+    const custom = document.getElementById('customAmount');
+    const amount = selectedAmount || (custom.style.display === 'block' ? custom.value : null);
+
+    if (!name) {
+      alert('Please enter your name');
+      return;
+    }
+    if (!amount || amount <= 0) {
+      alert('Please select or enter a valid amount');
+      return;
+    }
+
+    document.getElementById('qrBox').style.display = 'block';
+  }
+</script>
 </body>
 </html>
