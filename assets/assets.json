@@ -1,12 +1,12 @@
 {
   "sounds": [
     "assets/sounds/coffee.mp3",
-    "assets/sounds/bell.mp3"
+    "assets/sounds/bell.mp3",
     "assets/sounds/anya.mp3"
   ],
   "gifs": [
     "assets/gifs/hearts.gif",
-    "assets/gifs/glow.gif"
+    "assets/gifs/glow.gif",
     "assets/gifs/Coffee.gif"
   ]
 }
