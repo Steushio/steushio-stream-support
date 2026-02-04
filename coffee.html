@@ -134,38 +134,52 @@
   </div>
 
   <script>
-    let selectedAmount = null;
+  let selectedAmount = null;
 
-    function selectAmount(val, btn) {
-      document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+  function selectAmount(val, btn) {
+    document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
 
-      if (val === 'custom') {
-        document.getElementById('customAmount').style.display = 'block';
-        selectedAmount = null;
-      } else {
-        document.getElementById('customAmount').style.display = 'none';
-        selectedAmount = val;
-      }
+    if (val === 'custom') {
+      document.getElementById('customAmount').style.display = 'block';
+      selectedAmount = null;
+    } else {
+      document.getElementById('customAmount').style.display = 'none';
+      selectedAmount = val;
+    }
+  }
+
+  function showQR() {
+    const name = document.getElementById('name').value.trim();
+    const custom = document.getElementById('customAmount');
+    const amount = selectedAmount || (custom.style.display === 'block' ? Number(custom.value) : null);
+
+    if (!name) {
+      alert('Please enter your name');
+      return;
+    }
+    if (!amount || amount <= 0) {
+      alert('Please select or enter an amount');
+      return;
     }
 
-    function showQR() {
-      const name = document.getElementById('name').value.trim();
-      const custom = document.getElementById('customAmount');
-      const amount = selectedAmount || (custom.style.display === 'block' ? custom.value : null);
+    // 🔥 THIS IS THE IMPORTANT PART
+    fetch("http://192.168.1.2:8000/webhook", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: name,
+        amount: amount
+      })
+    }).catch(() => {});
 
-      if (!name) {
-        alert('Please enter your name');
-        return;
-      }
-      if (!amount || amount <= 0) {
-        alert('Please select or enter an amount');
-        return;
-      }
+    // Show QR normally
+    document.getElementById('qrBox').style.display = 'block';
+  }
+</script>
 
-      document.getElementById('qrBox').style.display = 'block';
-    }
-  </script>
 
 </body>
 </html>
