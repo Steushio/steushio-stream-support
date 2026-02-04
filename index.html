@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Steushio Stream Support</title>
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --card: #12172a;
+      --accent1: #7c4dff;
+      --accent2: #00d4ff;
+      --text: #e6e9f2;
+      --muted: #9aa3c7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif;
+      background: radial-gradient(1200px 600px at 50% -10%, #16204a 0%, var(--bg) 60%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      margin: 0 0 12px;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, #151b33, var(--card));
+      border-radius: 18px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.06), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 18px;
+      font-size: 1.6rem;
+      font-weight: 600;
+    }
+
+    .coffee { background: linear-gradient(135deg, var(--accent1), #b388ff); }
+    .tools { background: linear-gradient(135deg, var(--accent2), #4de7ff); }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 1.4rem;
+    }
+
+    .card p {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      color: #0b0f1a;
+      background: #fff;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+      opacity: 0.95;
+    }
+
+    footer {
+      margin-top: 56px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      margin: 0 8px;
+      text-decoration: none;
+    }
+
+    footer a:hover { color: var(--text); }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Steushio Stream Support</h1>
+      <p>Choose how you want to support the stream — quick appreciation or practical tools that level up the experience.</p>
+    </header>
+
+    <section class="options">
+      <!-- Option 1 -->
+      <div class="card">
+        <div class="icon coffee">☕</div>
+        <h2>Support Stream – Buy Me a Coffee</h2>
+        <p>
+          A simple way to show love and appreciation. Support the stream with a quick contribution and get a shoutout on stream.
+        </p>
+        <a href="#" class="btn">Support Now</a>
+      </div>
+
+      <!-- Option 2 -->
+      <div class="card">
+        <div class="icon tools">🛠️</div>
+        <h2>Support Stream – Buy Tools</h2>
+        <p>
+          Contribute by purchasing stream tools and assets. Your support directly improves overlays, alerts, and production quality.
+        </p>
+        <a href="#" class="btn">View Tools</a>
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        <a href="#">Privacy</a> ·
+        <a href="#">Refund</a> ·
+        <a href="#">About</a> ·
+        <a href="#">Contact</a>
+      </div>
+      <div style="margin-top: 8px;">© Steushio Stream Support</div>
+    </footer>
+  </div>
+</body>
+</html>
+
