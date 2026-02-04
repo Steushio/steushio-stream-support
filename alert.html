@@ -1,119 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Steushio Alert Overlay</title>
-
 <style>
-  body {
-    margin:0;
-    background:transparent;
-    overflow:hidden;
-    font-family:Arial, Helvetica, sans-serif;
-  }
-
-  #container {
-    position:absolute;
-    top:40%;
-    left:50%;
-    transform:translate(-50%, -50%) scale(0.8);
-    text-align:center;
-    opacity:0;
-    transition:all 0.4s ease;
-  }
-
-  #container.show {
-    opacity:1;
-    transform:translate(-50%, -50%) scale(1);
-  }
-
-  #gif {
-    max-width:300px;
-    margin-bottom:10px;
-    display:none;
-  }
-
-  #text {
-    background:rgba(0,0,0,0.75);
-    padding:16px 28px;
-    border-radius:16px;
-    font-size:28px;
-    color:white;
-    font-weight:bold;
-    box-shadow:0 0 30px rgba(255,255,255,0.2);
-  }
+body {
+  background:transparent;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+}
+#box {
+  display:none;
+}
+img {
+  max-width:300px;
+}
 </style>
 </head>
 
 <body>
 
-<div id="container">
+<div id="box">
   <img id="gif">
   <div id="text"></div>
+  <audio id="audio"></audio>
 </div>
 
-<audio id="sound"></audio>
-
 <script>
-let lastEvent = null;
-
-function getConfig() {
-  return JSON.parse(localStorage.getItem("alertConfig")) || {
-    text: "❤️ {name} supported ₹{amount}",
-    fontSize: 28,
-    color: "#ffffff",
-    sound: "",
-    gif: ""
-  };
-}
-
-async function poll() {
-  try {
-    const res = await fetch("http://localhost:8000/latest");
-    const data = await res.json();
-
-    if (!data.name || !data.amount) return;
-
-    const key = JSON.stringify(data);
-    if (key === lastEvent) return;
-    lastEvent = key;
-
-    showAlert(data.name, data.amount);
-  } catch {}
-}
-
 function showAlert(name, amount) {
-  const cfg = getConfig();
-  const box = document.getElementById("container");
-  const txt = document.getElementById("text");
-  const gif = document.getElementById("gif");
-  const snd = document.getElementById("sound");
+  const s = JSON.parse(localStorage.getItem("alert_settings"));
+  if (!s) return;
 
-  txt.innerHTML = cfg.text
+  const box = document.getElementById("box");
+  const gif = document.getElementById("gif");
+  const text = document.getElementById("text");
+  const audio = document.getElementById("audio");
+
+  text.innerText = s.text
     .replace("{name}", name)
     .replace("{amount}", amount);
 
-  txt.style.fontSize = cfg.fontSize + "px";
-  txt.style.color = cfg.color;
+  text.style.fontSize = s.size + "px";
+  text.style.color = s.color;
 
-  if (cfg.gif) {
-    gif.src = cfg.gif;
-    gif.style.display = "block";
-  } else {
-    gif.style.display = "none";
-  }
+  gif.src = s.gif;
+  audio.src = s.sound;
 
-  if (cfg.sound) {
-    snd.src = cfg.sound;
-    snd.currentTime = 0;
-    snd.play();
-  }
+  box.style.display = "block";
+  audio.play();
 
-  box.classList.add("show");
-  setTimeout(() => box.classList.remove("show"), 5000);
+  setTimeout(() => box.style.display = "none", 6000);
 }
 
-setInterval(poll, 2000);
+setInterval(() => {
+  const t = localStorage.getItem("alert_test");
+  if (t) {
+    localStorage.removeItem("alert_test");
+    const d = JSON.parse(t);
+    showAlert(d.name, d.amount);
+  }
+}, 500);
 </script>
 
 </body>
