@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Alert Control Panel</title>
+
+<style>
+  body {
+    font-family: Arial;
+    background: #0b1020;
+    color: white;
+    padding: 30px;
+  }
+
+  label { display:block; margin-top:15px; }
+  input, button {
+    padding: 8px;
+    margin-top: 5px;
+    width: 300px;
+  }
+
+  button {
+    margin-top: 20px;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>🎛️ Alert Control Panel</h2>
+
+<label>Thank You Text</label>
+<input id="text" value="❤️ {name} supported the stream">
+
+<label>Font Size</label>
+<input type="number" id="fontSize" value="28">
+
+<label>Text Color</label>
+<input type="color" id="color" value="#ffffff">
+
+<label>Sound File (e.g. alert.mp3)</label>
+<input id="sound" value="alert.mp3">
+
+<label>GIF File (optional)</label>
+<input id="gif" placeholder="alert.gif">
+
+<label>
+  <input type="checkbox" id="soundEnabled" checked>
+  Enable Sound
+</label>
+
+<button onclick="save()">Save Settings</button>
+<button onclick="preview()">Preview Alert</button>
+
+<script>
+function save() {
+  const cfg = {
+    text: text.value,
+    fontSize: fontSize.value,
+    color: color.value,
+    sound: sound.value,
+    gif: gif.value,
+    soundEnabled: soundEnabled.checked
+  };
+  localStorage.setItem("alertConfig", JSON.stringify(cfg));
+  alert("Saved! OBS will update instantly.");
+}
+
+function preview() {
+  localStorage.setItem("preview", Date.now());
+}
+</script>
+
+</body>
+</html>
