@@ -16,7 +16,7 @@
   input, button {
     padding: 8px;
     margin-top: 5px;
-    width: 300px;
+    width: 320px;
   }
 
   button {
@@ -31,7 +31,8 @@
 <h2>🎛️ Alert Control Panel</h2>
 
 <label>Thank You Text</label>
-<input id="text" value="❤️ {name} supported the stream">
+<input id="text" value="❤️ {name} supported ₹{amount}">
+<small>Use <b>{name}</b> and <b>{amount}</b></small>
 
 <label>Font Size</label>
 <input type="number" id="fontSize" value="28">
@@ -39,11 +40,11 @@
 <label>Text Color</label>
 <input type="color" id="color" value="#ffffff">
 
-<label>Sound File (e.g. alert.mp3)</label>
-<input id="sound" value="alert.mp3">
+<label>Alert Sound (mp3/wav)</label>
+<input type="file" id="soundFile" accept="audio/*">
 
-<label>GIF File (optional)</label>
-<input id="gif" placeholder="alert.gif">
+<label>Alert GIF</label>
+<input type="file" id="gifFile" accept="image/gif">
 
 <label>
   <input type="checkbox" id="soundEnabled" checked>
@@ -59,16 +60,34 @@ function save() {
     text: text.value,
     fontSize: fontSize.value,
     color: color.value,
-    sound: sound.value,
-    gif: gif.value,
     soundEnabled: soundEnabled.checked
   };
+
   localStorage.setItem("alertConfig", JSON.stringify(cfg));
+
+  if (soundFile.files[0]) {
+    localStorage.setItem(
+      "alertSound",
+      URL.createObjectURL(soundFile.files[0])
+    );
+  }
+
+  if (gifFile.files[0]) {
+    localStorage.setItem(
+      "alertGif",
+      URL.createObjectURL(gifFile.files[0])
+    );
+  }
+
   alert("Saved! OBS will update instantly.");
 }
 
 function preview() {
-  localStorage.setItem("preview", Date.now());
+  fetch("http://localhost:8000/webhook", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({name:"Test User", amount:100})
+  });
 }
 </script>
 
