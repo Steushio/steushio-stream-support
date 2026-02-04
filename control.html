@@ -5,40 +5,37 @@
 <title>Steushio Alert Control Panel</title>
 
 <style>
-  body {
-    background:#0b1020;
-    color:#fff;
-    font-family:Arial, Helvetica, sans-serif;
-    padding:30px;
-  }
-  h2 { margin-bottom: 10px; }
-  label { display:block; margin-top:15px; }
-  input, select, button {
-    width:340px;
-    padding:8px;
-    margin-top:5px;
-  }
-  button {
-    margin-top:15px;
-    cursor:pointer;
-  }
-  small { color:#aaa; }
+body {
+  background:#0b1020;
+  color:white;
+  font-family:Arial;
+  padding:20px;
+}
+input, select, button {
+  width:300px;
+  padding:8px;
+  margin:5px 0;
+}
+button {
+  cursor:pointer;
+}
+hr { margin:20px 0; }
 </style>
 </head>
 
 <body>
 
-<h2>🎛️ Alert Control Panel</h2>
+<h2>🎛 Alert Control Panel</h2>
 
 <label>Thank You Text</label>
 <input id="text" value="❤️ {name} supported ₹{amount}">
-<small>Use <b>{name}</b> and <b>{amount}</b></small>
+<small>Use {name} and {amount}</small>
 
 <label>Font Size</label>
-<input type="number" id="fontSize" value="28">
+<input id="size" type="number" value="28">
 
 <label>Text Color</label>
-<input type="color" id="color" value="#ffffff">
+<input id="color" type="color" value="#ffffff">
 
 <hr>
 
@@ -48,6 +45,8 @@
 <label>Select Alert GIF</label>
 <select id="gif"></select>
 
+<br><br>
+
 <button onclick="save()">Save Settings</button>
 <button onclick="preview()">Preview Alert</button>
 
@@ -56,51 +55,43 @@ async function loadAssets() {
   const res = await fetch("assets/assets.json");
   const data = await res.json();
 
-  const soundSel = document.getElementById("sound");
-  const gifSel = document.getElementById("gif");
+  const sound = document.getElementById("sound");
+  const gif = document.getElementById("gif");
 
-  soundSel.innerHTML = '<option value="">None</option>';
-  gifSel.innerHTML = '<option value="">None</option>';
+  sound.innerHTML = "";
+  gif.innerHTML = "";
 
-  data.sounds.forEach(path => {
-    const name = path.split("/").pop();
-    soundSel.innerHTML += `<option value="${path}">${name}</option>`;
+  data.sounds.forEach(s => {
+    let o = document.createElement("option");
+    o.value = s;
+    o.text = s.split("/").pop();
+    sound.appendChild(o);
   });
 
-  data.gifs.forEach(path => {
-    const name = path.split("/").pop();
-    gifSel.innerHTML += `<option value="${path}">${name}</option>`;
+  data.gifs.forEach(g => {
+    let o = document.createElement("option");
+    o.value = g;
+    o.text = g.split("/").pop();
+    gif.appendChild(o);
   });
-
-  // Load saved config if exists
-  const saved = JSON.parse(localStorage.getItem("alertConfig"));
-  if (saved) {
-    text.value = saved.text;
-    fontSize.value = saved.fontSize;
-    color.value = saved.color;
-    sound.value = saved.sound;
-    gif.value = saved.gif;
-  }
 }
 
 function save() {
-  const cfg = {
+  localStorage.setItem("alert_settings", JSON.stringify({
     text: text.value,
-    fontSize: fontSize.value,
+    size: size.value,
     color: color.value,
     sound: sound.value,
     gif: gif.value
-  };
-  localStorage.setItem("alertConfig", JSON.stringify(cfg));
-  alert("Saved! OBS will update instantly.");
+  }));
+  alert("Saved!");
 }
 
 function preview() {
-  fetch("http://localhost:8000/webhook", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: "Test User", amount: 100 })
-  });
+  localStorage.setItem("alert_test", JSON.stringify({
+    name: "Test User",
+    amount: "100"
+  }));
 }
 
 loadAssets();
