@@ -1,23 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Alert Control Panel</title>
+<title>Steushio Alert Control Panel</title>
 
 <style>
   body {
     background:#0b1020;
     color:#fff;
-    font-family:Arial;
+    font-family:Arial, Helvetica, sans-serif;
     padding:30px;
   }
+  h2 { margin-bottom: 10px; }
   label { display:block; margin-top:15px; }
-  select, input, button {
+  input, select, button {
     width:340px;
     padding:8px;
     margin-top:5px;
   }
-  button { margin-top:15px; cursor:pointer; }
+  button {
+    margin-top:15px;
+    cursor:pointer;
+  }
+  small { color:#aaa; }
 </style>
 </head>
 
@@ -38,25 +43,46 @@
 <hr>
 
 <label>Select Alert Sound</label>
-<select id="sound">
-  <option value="">None</option>
-  <option value="assets/sounds/coffee.mp3">Coffee</option>
-  <option value="assets/sounds/pop.mp3">Pop</option>
-  <option value="assets/sounds/bell.mp3">Bell</option>
-</select>
+<select id="sound"></select>
 
 <label>Select Alert GIF</label>
-<select id="gif">
-  <option value="">None</option>
-  <option value="assets/gifs/hearts.gif">Hearts</option>
-  <option value="assets/gifs/coffee.gif">Coffee</option>
-  <option value="assets/gifs/glow.gif">Glow</option>
-</select>
+<select id="gif"></select>
 
 <button onclick="save()">Save Settings</button>
 <button onclick="preview()">Preview Alert</button>
 
 <script>
+async function loadAssets() {
+  const res = await fetch("assets/assets.json");
+  const data = await res.json();
+
+  const soundSel = document.getElementById("sound");
+  const gifSel = document.getElementById("gif");
+
+  soundSel.innerHTML = '<option value="">None</option>';
+  gifSel.innerHTML = '<option value="">None</option>';
+
+  data.sounds.forEach(path => {
+    const name = path.split("/").pop();
+    soundSel.innerHTML += `<option value="${path}">${name}</option>`;
+  });
+
+  data.gifs.forEach(path => {
+    const name = path.split("/").pop();
+    gifSel.innerHTML += `<option value="${path}">${name}</option>`;
+  });
+
+  // Load saved config if exists
+  const saved = JSON.parse(localStorage.getItem("alertConfig"));
+  if (saved) {
+    text.value = saved.text;
+    fontSize.value = saved.fontSize;
+    color.value = saved.color;
+    sound.value = saved.sound;
+    gif.value = saved.gif;
+  }
+}
+
 function save() {
   const cfg = {
     text: text.value,
@@ -71,11 +97,13 @@ function save() {
 
 function preview() {
   fetch("http://localhost:8000/webhook", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ name:"Test User", amount:100 })
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: "Test User", amount: 100 })
   });
 }
+
+loadAssets();
 </script>
 
 </body>
