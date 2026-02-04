@@ -1,114 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Steushio Stream Support</title>
+<meta charset="UTF-8">
+<title>Steushio Stream Support</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, #121a2f, #05070f);
-      color: #fff;
-    }
+<style>
+  body {
+    margin: 0;
+    background: #0b1020;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
 
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 80px 20px;
-      text-align: center;
-    }
+  .card {
+    background: rgba(255,255,255,0.05);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0,0,0,0.4);
+    width: 320px;
+  }
 
-    h1 {
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
+  h1 {
+    margin-bottom: 20px;
+  }
 
-    p.sub {
-      color: #b6c0ff;
-      margin-bottom: 60px;
-    }
+  a.button {
+    display: block;
+    padding: 14px;
+    margin-top: 15px;
+    background: #ffcc00;
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 12px;
+  }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 30px;
-    }
-
-    .card {
-      background: linear-gradient(145deg, #10172a, #0b1020);
-      border-radius: 18px;
-      padding: 30px;
-      text-align: left;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    .card h2 {
-      margin-top: 0;
-    }
-
-    .card p {
-      color: #cbd3ff;
-    }
-
-    .btn {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 12px 22px;
-      border-radius: 10px;
-      background: #fff;
-      color: #000;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    footer {
-      margin-top: 80px;
-      font-size: 13px;
-      color: #888;
-    }
-
-    footer a {
-      color: #aaa;
-      text-decoration: none;
-      margin: 0 8px;
-    }
-  </style>
+  a.button:hover {
+    background: #ffd633;
+  }
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Steushio Stream Support</h1>
-    <p class="sub">
-      Choose how you want to support the stream — quick appreciation or practical tools.
-    </p>
 
-    <div class="cards">
-      <div class="card">
-        <h2>☕ Buy Me a Coffee</h2>
-        <p>
-          Support the stream with a quick contribution and show some love.
-        </p>
-        <a href="coffee.html" class="btn">Support Now</a>
-      </div>
+<div class="card">
+  <h1>☕ Steushio Stream Support</h1>
+  <p>Support the stream & keep it going ❤️</p>
 
-      <div class="card">
-        <h2>🛠 Buy Tools</h2>
-        <p>
-          Support the stream by contributing towards overlays, alerts, and tools.
-        </p>
-        <a href="#" class="btn">View Tools</a>
-      </div>
-    </div>
+  <a class="button" href="coffee.html">
+    Buy Me a Coffee
+  </a>
+</div>
 
-    <footer>
-      <a href="#">Privacy</a> ·
-      <a href="#">Refund</a> ·
-      <a href="#">About</a> ·
-      <a href="#">Contact</a><br><br>
-      © Steushio Stream Support
-    </footer>
-  </div>
 </body>
 </html>
