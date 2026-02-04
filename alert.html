@@ -9,7 +9,7 @@ body {
   margin:0;
   background:transparent;
   overflow:hidden;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
 }
 #alert {
   display:none;
@@ -43,22 +43,35 @@ let lastId = null;
 
 async function poll() {
   try {
-    const res = await fetch("http://192.168.1.2:8000/latest");
-    const data = await res.json();
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 1000);
 
+    const res = await fetch("http://192.168.1.2:8000/latest", {
+      signal: controller.signal
+    });
+
+    const data = await res.json();
     if (!data || !data.name) return;
 
-    // prevent duplicate alerts
     if (data.id === lastId) return;
     lastId = data.id;
 
     showAlert(data.name, data.amount, data.settings);
   } catch (e) {
-    // server offline / ignored
+    // silent fail (server offline etc.)
   }
 }
 
 function showAlert(name, amount, settings) {
+
+  settings = settings || {
+    text: "❤️ {name} supported ₹{amount}",
+    color: "#ffffff",
+    size: 28,
+    gif: "",
+    sound: ""
+  };
+
   const box = document.getElementById("alert");
   const text = document.getElementById("text");
   const gif = document.getElementById("gif");
@@ -72,14 +85,15 @@ function showAlert(name, amount, settings) {
   text.style.color = settings.color;
   text.style.fontSize = settings.size + "px";
 
-  gif.src = settings.gif;
-
-  audio.src = settings.sound;
+  gif.src = settings.gif || "";
+  audio.src = settings.sound || "";
   audio.currentTime = 0;
-  audio.play();
+  audio.play().catch(() => {});
 
   box.style.display = "block";
-  setTimeout(() => box.style.display = "none", 6000);
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 6000);
 }
 
 setInterval(poll, 1500);
