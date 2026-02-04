@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Steushio Alert Control Panel</title>
@@ -12,14 +12,13 @@ body {
   padding:20px;
 }
 input, select, button {
-  width:300px;
   padding:8px;
-  margin:5px 0;
+  margin:6px 0;
+  width:260px;
 }
 button {
   cursor:pointer;
 }
-hr { margin:20px 0; }
 </style>
 </head>
 
@@ -27,74 +26,89 @@ hr { margin:20px 0; }
 
 <h2>🎛 Alert Control Panel</h2>
 
-<label>Thank You Text</label>
-<input id="text" value="❤️ {name} supported ₹{amount}">
-<small>Use {name} and {amount}</small>
+<label>Thank You Text</label><br>
+<input id="thankText" value="❤️ {name} supported ₹{amount}"><br>
 
-<label>Font Size</label>
-<input id="size" type="number" value="28">
+<label>Font Size</label><br>
+<input type="number" id="fontSize" value="28"><br>
 
-<label>Text Color</label>
-<input id="color" type="color" value="#ffffff">
+<label>Text Color</label><br>
+<input type="color" id="textColor" value="#ffffff"><br>
 
 <hr>
 
-<label>Select Alert Sound</label>
-<select id="sound"></select>
+<label>Select Alert Sound</label><br>
+<select id="alertSound"></select><br>
 
-<label>Select Alert GIF</label>
-<select id="gif"></select>
+<label>Select Alert GIF</label><br>
+<select id="alertGif"></select><br>
 
-<br><br>
-
-<button onclick="save()">Save Settings</button>
-<button onclick="preview()">Preview Alert</button>
+<br>
+<button onclick="saveSettings()">Save Settings</button>
+<button onclick="previewAlert()">Preview Alert</button>
 
 <script>
-async function loadAssets() {
-  const res = await fetch("assets/assets.json");
-  const data = await res.json();
+document.addEventListener("DOMContentLoaded", () => {
 
-  const sound = document.getElementById("sound");
-  const gif = document.getElementById("gif");
+  fetch("assets/assets.json")
+    .then(r => r.json())
+    .then(data => {
 
-  sound.innerHTML = "";
-  gif.innerHTML = "";
+      const soundSelect = document.getElementById("alertSound");
+      const gifSelect = document.getElementById("alertGif");
 
-  data.sounds.forEach(s => {
-    let o = document.createElement("option");
-    o.value = s;
-    o.text = s.split("/").pop();
-    sound.appendChild(o);
-  });
+      soundSelect.innerHTML = "";
+      gifSelect.innerHTML = "";
 
-  data.gifs.forEach(g => {
-    let o = document.createElement("option");
-    o.value = g;
-    o.text = g.split("/").pop();
-    gif.appendChild(o);
-  });
-}
+      data.sounds.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = s.split("/").pop();
+        soundSelect.appendChild(opt);
+      });
 
-function save() {
-  localStorage.setItem("alert_settings", JSON.stringify({
-    text: text.value,
-    size: size.value,
-    color: color.value,
-    sound: sound.value,
-    gif: gif.value
+      data.gifs.forEach(g => {
+        const opt = document.createElement("option");
+        opt.value = g;
+        opt.textContent = g.split("/").pop();
+        gifSelect.appendChild(opt);
+      });
+
+      // load saved settings
+      const saved = JSON.parse(localStorage.getItem("alertSettings"));
+      if (saved) {
+        thankText.value = saved.text;
+        fontSize.value = saved.size;
+        textColor.value = saved.color;
+        alertSound.value = saved.sound;
+        alertGif.value = saved.gif;
+      }
+
+    })
+    .catch(err => {
+      alert("Failed to load assets.json");
+      console.error(err);
+    });
+
+});
+
+function saveSettings() {
+  localStorage.setItem("alertSettings", JSON.stringify({
+    text: thankText.value,
+    size: fontSize.value,
+    color: textColor.value,
+    sound: alertSound.value,
+    gif: alertGif.value
   }));
-  alert("Saved!");
+  alert("Saved");
 }
 
-function preview() {
-  localStorage.setItem("alert_test", JSON.stringify({
+function previewAlert() {
+  localStorage.setItem("triggerAlert", JSON.stringify({
     name: "Test User",
     amount: "100"
   }));
 }
-
-loadAssets();
 </script>
 
 </body>
