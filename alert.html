@@ -1,84 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Steushio Alert</title>
+<meta charset="UTF-8">
+<title>Steushio Stream Alert</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: transparent;
-      overflow: hidden;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+<style>
+  body {
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+  }
 
-    #alertBox {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.8);
-      padding: 20px 30px;
-      background: rgba(0, 0, 0, 0.75);
-      color: white;
-      border-radius: 16px;
-      font-size: 28px;
-      opacity: 0;
-      transition: all 0.4s ease;
-      text-align: center;
-      box-shadow: 0 0 30px rgba(255,255,255,0.15);
-    }
+  #alert {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    padding: 24px 36px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    border-radius: 18px;
+    font-size: 28px;
+    font-weight: bold;
+    opacity: 0;
+    transition: all 0.45s ease;
+    box-shadow: 0 0 35px rgba(255,255,255,0.2);
+    text-align: center;
+    white-space: nowrap;
+  }
 
-    #alertBox.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-  </style>
+  #alert.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+</style>
 </head>
 
 <body>
 
-  <div id="alertBox"></div>
+<div id="alert"></div>
 
-  <!-- Sound -->
-  <audio id="alertSound" src="alert.mp3"></audio>
+<!-- Alert sound -->
+<audio id="alertSound" src="alert.mp3" preload="auto"></audio>
 
-  <script>
-    let lastEvent = null;
+<script>
+let lastEvent = null;
 
-    async function checkAlert() {
-      try {
-        const res = await fetch("http://localhost:8000/latest");
-        const data = await res.json();
+async function pollAlert() {
+  try {
+    const res = await fetch("http://localhost:8000/latest");
+    const data = await res.json();
 
-        if (!data.name) return;
+    if (!data || !data.name) return;
 
-        const key = JSON.stringify(data);
-        if (key === lastEvent) return;
+    const eventKey = JSON.stringify(data);
+    if (eventKey === lastEvent) return;
 
-        lastEvent = key;
-        showAlert(data.name, data.amount);
-      } catch (e) {
-        // silently ignore
-      }
-    }
+    lastEvent = eventKey;
+    showAlert(data.name, data.amount);
+  } catch (e) {
+    // silently ignore connection errors
+  }
+}
 
-    function showAlert(name, amount) {
-      const box = document.getElementById("alertBox");
-      const sound = document.getElementById("alertSound");
+function showAlert(name, amount) {
+  const alertBox = document.getElementById("alert");
+  const sound = document.getElementById("alertSound");
 
-      box.innerHTML = `❤️ <b>${name}</b> supported the stream`;
-      box.classList.add("show");
+  alertBox.innerHTML = `❤️ <span>${name}</span> supported the stream`;
+  alertBox.classList.add("show");
 
-      sound.currentTime = 0;
-      sound.play();
+  sound.currentTime = 0;
+  sound.play();
 
-      setTimeout(() => {
-        box.classList.remove("show");
-      }, 5000);
-    }
+  setTimeout(() => {
+    alertBox.classList.remove("show");
+  }, 5000);
+}
 
-    setInterval(checkAlert, 2000);
-  </script>
+// check every 2 seconds
+setInterval(pollAlert, 2000);
+</script>
 
 </body>
 </html>
