@@ -1,0 +1,8 @@
+{
+  "sounds": [
+    { "name": "Anya", "file": "assets/sounds/anya.mp3" }
+  ],
+  "gifs": [
+    { "name": "Hearts", "file": "assets/gifs/Coffee.gif" },
+  ]
+}
