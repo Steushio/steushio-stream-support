@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buy Me a Coffee | Steushio Stream Support</title>
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --card: #12172a;
+      --accent: #7c4dff;
+      --text: #e6e9f2;
+      --muted: #9aa3c7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif;
+      background: radial-gradient(1000px 500px at 50% -10%, #16204a 0%, var(--bg) 60%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      max-width: 520px;
+      width: 100%;
+      background: linear-gradient(180deg, #151b33, var(--card));
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.45);
+      text-align: center;
+    }
+    h1 { margin: 0 0 10px; }
+    p { color: var(--muted); line-height: 1.6; }
+    .qr {
+      width: 240px;
+      height: 240px;
+      margin: 24px auto 12px;
+      background: #0b0f1a;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .upi {
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .note {
+      margin-top: 18px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .back {
+      display: inline-block;
+      margin-top: 26px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: #fff;
+      color: #0b0f1a;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>☕ Buy Me a Coffee</h1>
+    <p>
+      Enjoying the stream? You can support it with a coffee using direct UPI.
+      This support goes directly to the creator.
+    </p>
+
+    <div class="qr">PLACE YOUR UPI QR HERE</div>
+    <div class="upi">UPI ID: yourname@upi</div>
+
+    <div class="note">
+      After supporting, please type <strong>done</strong> in chat ❤️<br />
+      Your on-stream alert will play shortly.
+    </div>
+
+    <a href="index.html" class="back">← Back to home</a>
+  </div>
+</body>
+</html>
