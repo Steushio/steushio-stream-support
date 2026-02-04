@@ -2,63 +2,68 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<title>Alert</title>
+
 <style>
 body {
+  margin:0;
   background:transparent;
-  color:white;
+  overflow:hidden;
   font-family:Arial;
+}
+#alert {
+  display:none;
+  position:absolute;
+  top:40%;
+  width:100%;
   text-align:center;
 }
-#box {
-  display:none;
-}
-img {
-  max-width:300px;
+#alert img {
+  max-width:200px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="box">
+<div id="alert">
   <img id="gif">
   <div id="text"></div>
-  <audio id="audio"></audio>
 </div>
 
+<audio id="sound"></audio>
+
 <script>
-function showAlert(name, amount) {
-  const s = JSON.parse(localStorage.getItem("alert_settings"));
-  if (!s) return;
+setInterval(() => {
+  const trigger = localStorage.getItem("triggerAlert");
+  if (!trigger) return;
 
-  const box = document.getElementById("box");
-  const gif = document.getElementById("gif");
-  const text = document.getElementById("text");
-  const audio = document.getElementById("audio");
+  localStorage.removeItem("triggerAlert");
 
-  text.innerText = s.text
-    .replace("{name}", name)
-    .replace("{amount}", amount);
+  const data = JSON.parse(trigger);
+  const settings = JSON.parse(localStorage.getItem("alertSettings"));
 
-  text.style.fontSize = s.size + "px";
-  text.style.color = s.color;
+  if (!settings) return;
 
-  gif.src = s.gif;
-  audio.src = s.sound;
+  const text = settings.text
+    .replace("{name}", data.name)
+    .replace("{amount}", data.amount);
 
-  box.style.display = "block";
+  document.getElementById("text").textContent = text;
+  document.getElementById("text").style.color = settings.color;
+  document.getElementById("text").style.fontSize = settings.size + "px";
+
+  document.getElementById("gif").src = settings.gif;
+
+  const audio = document.getElementById("sound");
+  audio.src = settings.sound;
   audio.play();
 
-  setTimeout(() => box.style.display = "none", 6000);
-}
+  const box = document.getElementById("alert");
+  box.style.display = "block";
 
-setInterval(() => {
-  const t = localStorage.getItem("alert_test");
-  if (t) {
-    localStorage.removeItem("alert_test");
-    const d = JSON.parse(t);
-    showAlert(d.name, d.amount);
-  }
+  setTimeout(() => box.style.display = "none", 6000);
+
 }, 500);
 </script>
 
