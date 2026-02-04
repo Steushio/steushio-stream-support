@@ -1,70 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Alert</title>
 
 <style>
-body {
-  margin:0;
-  background:transparent;
-  overflow:hidden;
-  font-family:Arial;
-}
-#alert {
-  display:none;
-  position:absolute;
-  top:40%;
-  width:100%;
-  text-align:center;
-}
-#alert img {
-  max-width:200px;
-}
+  body {
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+
+  #box {
+    display: none;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 26px;
+    background: rgba(0,0,0,0.8);
+    border-radius: 16px;
+  }
+
+  #box img {
+    width: 90px;
+  }
+
+  #text {
+    color: #00ff66;
+    font-size: 28px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
 </style>
 </head>
 
 <body>
 
-<div id="alert">
-  <img id="gif">
+<div id="box">
+  <img src="Coffee.gif">
   <div id="text"></div>
 </div>
 
-<audio id="sound"></audio>
+<audio id="sound" src="anya.mp3"></audio>
 
 <script>
-setInterval(() => {
-  const trigger = localStorage.getItem("triggerAlert");
-  if (!trigger) return;
+let last = "";
 
-  localStorage.removeItem("triggerAlert");
+async function poll() {
+  try {
+    const r = await fetch("http://localhost:8000/latest");
+    const d = await r.json();
 
-  const data = JSON.parse(trigger);
-  const settings = JSON.parse(localStorage.getItem("alertSettings"));
+    if (!d || !d.name || !d.amount) return;
 
-  if (!settings) return;
+    const key = d.name + d.amount;
+    if (key === last) return;
+    last = key;
 
-  const text = settings.text
-    .replace("{name}", data.name)
-    .replace("{amount}", data.amount);
+    show(d);
+  } catch(e){}
+}
 
-  document.getElementById("text").textContent = text;
-  document.getElementById("text").style.color = settings.color;
-  document.getElementById("text").style.fontSize = settings.size + "px";
+function show(d) {
+  const box = document.getElementById("box");
+  const text = document.getElementById("text");
+  const sound = document.getElementById("sound");
 
-  document.getElementById("gif").src = settings.gif;
+  text.innerText = `${d.name} just tipped ₹${d.amount}`;
+  box.style.display = "flex";
 
-  const audio = document.getElementById("sound");
-  audio.src = settings.sound;
-  audio.play();
+  sound.currentTime = 0;
+  sound.play();
 
-  const box = document.getElementById("alert");
-  box.style.display = "block";
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 5000);
+}
 
-  setTimeout(() => box.style.display = "none", 6000);
-
-}, 500);
+setInterval(poll, 2000);
 </script>
 
 </body>
