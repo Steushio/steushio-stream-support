@@ -51,71 +51,49 @@ hr {
 <button onclick="previewAlert()">Preview Alert</button>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("./assets.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("assets.json not found");
 
-  fetch("./assets.json")
-    .then(r => r.json())
-    .then(data => {
+    const data = await res.json();
 
-      const soundSelect = document.getElementById("alertSound");
-      const gifSelect = document.getElementById("alertGif");
+    const soundSelect = document.getElementById("alertSound");
+    const gifSelect = document.getElementById("alertGif");
 
-      soundSelect.innerHTML = "";
-      gifSelect.innerHTML = "";
+    soundSelect.innerHTML = "<option value=''>-- Select Sound --</option>";
+    gifSelect.innerHTML = "<option value=''>-- Select GIF --</option>";
 
-      data.sounds.forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s;
-        opt.textContent = s.split("/").pop();
-        soundSelect.appendChild(opt);
-      });
-
-      data.gifs.forEach(g => {
-        const opt = document.createElement("option");
-        opt.value = g;
-        opt.textContent = g.split("/").pop();
-        gifSelect.appendChild(opt);
-      });
-
-      const saved = JSON.parse(localStorage.getItem("alertSettings"));
-      if (saved) {
-        thankText.value = saved.text;
-        fontSize.value = saved.size;
-        textColor.value = saved.color;
-        alertSound.value = saved.sound;
-        alertGif.value = saved.gif;
-      }
-    })
-    .catch(err => {
-      alert("Failed to load assets.json");
-      console.error(err);
+    data.sounds.forEach(path => {
+      const opt = document.createElement("option");
+      opt.value = path;
+      opt.textContent = path.split("/").pop();
+      soundSelect.appendChild(opt);
     });
+
+    data.gifs.forEach(path => {
+      const opt = document.createElement("option");
+      opt.value = path;
+      opt.textContent = path.split("/").pop();
+      gifSelect.appendChild(opt);
+    });
+
+    const saved = JSON.parse(localStorage.getItem("alertSettings"));
+    if (saved) {
+      thankText.value = saved.text;
+      fontSize.value = saved.size;
+      textColor.value = saved.color;
+      alertSound.value = saved.sound;
+      alertGif.value = saved.gif;
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Failed to load assets.json — check path & structure");
+  }
 });
-
-function saveSettings() {
-  localStorage.setItem("alertSettings", JSON.stringify({
-    text: thankText.value,
-    size: Number(fontSize.value),
-    color: textColor.value,
-    sound: alertSound.value,
-    gif: alertGif.value
-  }));
-  alert("Settings Saved");
-}
-
-function previewAlert() {
-  fetch("http://192.168.1.2:8000/webhook", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: "Test Supporter",
-      amount: 100
-    })
-  }).catch(() => {
-    alert("Webhook server not reachable");
-  });
-}
 </script>
+
 
 </body>
 </html>
