@@ -8,7 +8,7 @@
 body {
   background:#0b1020;
   color:white;
-  font-family:Arial, sans-serif;
+  font-family:Arial;
   padding:20px;
 }
 input, select, button {
@@ -18,9 +18,6 @@ input, select, button {
 }
 button {
   cursor:pointer;
-}
-hr {
-  margin:20px 0;
 }
 </style>
 </head>
@@ -51,49 +48,68 @@ hr {
 <button onclick="previewAlert()">Preview Alert</button>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const res = await fetch("./assets.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("assets.json not found");
+document.addEventListener("DOMContentLoaded", () => {
 
-    const data = await res.json();
+  fetch("assets/assets.json")
+    .then(r => r.json())
+    .then(data => {
 
-    const soundSelect = document.getElementById("alertSound");
-    const gifSelect = document.getElementById("alertGif");
+      const soundSelect = document.getElementById("alertSound");
+      const gifSelect = document.getElementById("alertGif");
 
-    soundSelect.innerHTML = "<option value=''>-- Select Sound --</option>";
-    gifSelect.innerHTML = "<option value=''>-- Select GIF --</option>";
+      soundSelect.innerHTML = "";
+      gifSelect.innerHTML = "";
 
-    data.sounds.forEach(path => {
-      const opt = document.createElement("option");
-      opt.value = path;
-      opt.textContent = path.split("/").pop();
-      soundSelect.appendChild(opt);
+      data.sounds.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = s.split("/").pop();
+        soundSelect.appendChild(opt);
+      });
+
+      data.gifs.forEach(g => {
+        const opt = document.createElement("option");
+        opt.value = g;
+        opt.textContent = g.split("/").pop();
+        gifSelect.appendChild(opt);
+      });
+
+      // load saved settings
+      const saved = JSON.parse(localStorage.getItem("alertSettings"));
+      if (saved) {
+        thankText.value = saved.text;
+        fontSize.value = saved.size;
+        textColor.value = saved.color;
+        alertSound.value = saved.sound;
+        alertGif.value = saved.gif;
+      }
+
+    })
+    .catch(err => {
+      alert("Failed to load assets.json");
+      console.error(err);
     });
 
-    data.gifs.forEach(path => {
-      const opt = document.createElement("option");
-      opt.value = path;
-      opt.textContent = path.split("/").pop();
-      gifSelect.appendChild(opt);
-    });
-
-    const saved = JSON.parse(localStorage.getItem("alertSettings"));
-    if (saved) {
-      thankText.value = saved.text;
-      fontSize.value = saved.size;
-      textColor.value = saved.color;
-      alertSound.value = saved.sound;
-      alertGif.value = saved.gif;
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert("❌ Failed to load assets.json — check path & structure");
-  }
 });
-</script>
 
+function saveSettings() {
+  localStorage.setItem("alertSettings", JSON.stringify({
+    text: thankText.value,
+    size: fontSize.value,
+    color: textColor.value,
+    sound: alertSound.value,
+    gif: alertGif.value
+  }));
+  alert("Saved");
+}
+
+function previewAlert() {
+  localStorage.setItem("triggerAlert", JSON.stringify({
+    name: "Test User",
+    amount: "100"
+  }));
+}
+</script>
 
 </body>
 </html>
