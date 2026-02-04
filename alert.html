@@ -1,58 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Alert Overlay</title>
-
-<style>
-  body {
-    margin: 0;
-    background: transparent;
-    overflow: hidden;
-    font-family: Arial, Helvetica, sans-serif;
-  }
-
-  #container {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    text-align: center;
-    opacity: 0;
-    transition: all 0.4s ease;
-  }
-
-  #container.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-
-  #gif {
-    max-width: 300px;
-    margin-bottom: 10px;
-    display: none;
-  }
-
-  #text {
-    background: rgba(0,0,0,0.7);
-    padding: 16px 26px;
-    border-radius: 16px;
-    font-size: 28px;
-    color: white;
-    font-weight: bold;
-  }
-</style>
-</head>
-
-<body>
-
-<div id="container">
-  <img id="gif">
-  <div id="text"></div>
-</div>
-
-<audio id="sound"></audio>
-
 <script>
 let lastEvent = null;
 
@@ -61,48 +6,52 @@ function getConfig() {
     text: "❤️ {name} supported ₹{amount}",
     fontSize: 28,
     color: "#ffffff",
-    soundEnabled: true
+    sound: "",
+    gif: ""
   };
 }
 
 async function poll() {
   try {
-    const res = await fetch("http://localhost:8000/latest");
-    const data = await res.json();
+    const r = await fetch("http://localhost:8000/latest");
+    const d = await r.json();
+    if (!d.name || !d.amount) return;
 
-    if (!data.name || !data.amount) return;
-
-    const key = JSON.stringify(data);
+    const key = JSON.stringify(d);
     if (key === lastEvent) return;
-
     lastEvent = key;
-    showAlert(data.name, data.amount);
+
+    showAlert(d.name, d.amount);
   } catch {}
 }
 
 function showAlert(name, amount) {
   const cfg = getConfig();
   const box = document.getElementById("container");
-  const text = document.getElementById("text");
+  const txt = document.getElementById("text");
   const gif = document.getElementById("gif");
-  const sound = document.getElementById("sound");
+  const snd = document.getElementById("sound");
 
-  text.innerHTML = cfg.text
+  txt.innerHTML = cfg.text
     .replace("{name}", name)
     .replace("{amount}", amount);
+  txt.style.fontSize = cfg.fontSize + "px";
+  txt.style.color = cfg.color;
 
-  text.style.fontSize = cfg.fontSize + "px";
-  text.style.color = cfg.color;
-
-  const gifURL = localStorage.getItem("alertGif");
-  if (gifURL) {
-    gif.src = gifURL;
+  if (cfg.gif) {
+    gif.src = cfg.gif;
     gif.style.display = "block";
-  } else {
-    gif.style.display = "none";
+  } else gif.style.display = "none";
+
+  if (cfg.sound) {
+    snd.src = cfg.sound;
+    snd.currentTime = 0;
+    snd.play();
   }
 
-  const soundURL = localStorage.getItem("alertSound");
-  if (cfg.soundEnabled && soundURL) {
-    sound.src = soundURL;
-    sound.currentTi
+  box.classList.add("show");
+  setTimeout(() => box.classList.remove("show"), 5000);
+}
+
+setInterval(poll, 2000);
+</script>
