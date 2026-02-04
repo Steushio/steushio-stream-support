@@ -30,6 +30,7 @@
   #gif {
     max-width: 300px;
     margin-bottom: 10px;
+    display: none;
   }
 
   #text {
@@ -46,7 +47,7 @@
 <body>
 
 <div id="container">
-  <img id="gif" src="" style="display:none;">
+  <img id="gif">
   <div id="text"></div>
 </div>
 
@@ -57,11 +58,9 @@ let lastEvent = null;
 
 function getConfig() {
   return JSON.parse(localStorage.getItem("alertConfig")) || {
-    text: "❤️ {name} supported the stream",
+    text: "❤️ {name} supported ₹{amount}",
     fontSize: 28,
     color: "#ffffff",
-    sound: "alert.mp3",
-    gif: "",
     soundEnabled: true
   };
 }
@@ -71,44 +70,39 @@ async function poll() {
     const res = await fetch("http://localhost:8000/latest");
     const data = await res.json();
 
-    if (!data.name) return;
-    if (JSON.stringify(data) === lastEvent) return;
+    if (!data.name || !data.amount) return;
 
-    lastEvent = JSON.stringify(data);
-    showAlert(data.name);
+    const key = JSON.stringify(data);
+    if (key === lastEvent) return;
+
+    lastEvent = key;
+    showAlert(data.name, data.amount);
   } catch {}
 }
 
-function showAlert(name) {
+function showAlert(name, amount) {
   const cfg = getConfig();
   const box = document.getElementById("container");
   const text = document.getElementById("text");
   const gif = document.getElementById("gif");
   const sound = document.getElementById("sound");
 
-  text.innerHTML = cfg.text.replace("{name}", name);
+  text.innerHTML = cfg.text
+    .replace("{name}", name)
+    .replace("{amount}", amount);
+
   text.style.fontSize = cfg.fontSize + "px";
   text.style.color = cfg.color;
 
-  if (cfg.gif) {
-    gif.src = cfg.gif;
+  const gifURL = localStorage.getItem("alertGif");
+  if (gifURL) {
+    gif.src = gifURL;
     gif.style.display = "block";
   } else {
     gif.style.display = "none";
   }
 
-  if (cfg.soundEnabled && cfg.sound) {
-    sound.src = cfg.sound;
-    sound.currentTime = 0;
-    sound.play();
-  }
-
-  box.classList.add("show");
-  setTimeout(() => box.classList.remove("show"), 5000);
-}
-
-setInterval(poll, 2000);
-</script>
-
-</body>
-</html>
+  const soundURL = localStorage.getItem("alertSound");
+  if (cfg.soundEnabled && soundURL) {
+    sound.src = soundURL;
+    sound.currentTi
