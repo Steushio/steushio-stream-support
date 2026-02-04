@@ -8,7 +8,7 @@
 body {
   background:#0b1020;
   color:white;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
   padding:20px;
 }
 input, select, button {
@@ -18,6 +18,9 @@ input, select, button {
 }
 button {
   cursor:pointer;
+}
+hr {
+  margin:20px 0;
 }
 </style>
 </head>
@@ -50,7 +53,7 @@ button {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  fetch("assets/assets.json")
+  fetch("./assets.json")
     .then(r => r.json())
     .then(data => {
 
@@ -74,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
         gifSelect.appendChild(opt);
       });
 
-      // load saved settings
       const saved = JSON.parse(localStorage.getItem("alertSettings"));
       if (saved) {
         thankText.value = saved.text;
@@ -83,34 +85,35 @@ document.addEventListener("DOMContentLoaded", () => {
         alertSound.value = saved.sound;
         alertGif.value = saved.gif;
       }
-
     })
     .catch(err => {
       alert("Failed to load assets.json");
       console.error(err);
     });
-
 });
 
 function saveSettings() {
   localStorage.setItem("alertSettings", JSON.stringify({
     text: thankText.value,
-    size: fontSize.value,
+    size: Number(fontSize.value),
     color: textColor.value,
     sound: alertSound.value,
     gif: alertGif.value
   }));
-  alert("Saved");
+  alert("Settings Saved");
 }
 
-function preview() {
+function previewAlert() {
   fetch("http://192.168.1.2:8000/webhook", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: "Test Supporter",
       amount: 100
-  }));
+    })
+  }).catch(() => {
+    alert("Webhook server not reachable");
+  });
 }
 </script>
 
