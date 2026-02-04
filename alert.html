@@ -21,6 +21,11 @@ body {
 #alert img {
   max-width:200px;
 }
+#text {
+  font-size:28px;
+  color:white;
+  font-weight:bold;
+}
 </style>
 </head>
 
@@ -34,37 +39,50 @@ body {
 <audio id="sound"></audio>
 
 <script>
-setInterval(() => {
-  const trigger = localStorage.getItem("triggerAlert");
-  if (!trigger) return;
+let lastId = null;
 
-  localStorage.removeItem("triggerAlert");
+async function poll() {
+  try {
+    const res = await fetch("http://192.168.1.2:8000/latest");
+    const data = await res.json();
 
-  const data = JSON.parse(trigger);
-  const settings = JSON.parse(localStorage.getItem("alertSettings"));
+    if (!data || !data.name) return;
 
-  if (!settings) return;
+    // prevent duplicate alerts
+    if (data.id === lastId) return;
+    lastId = data.id;
 
-  const text = settings.text
-    .replace("{name}", data.name)
-    .replace("{amount}", data.amount);
+    showAlert(data.name, data.amount, data.settings);
+  } catch (e) {
+    // server offline / ignored
+  }
+}
 
-  document.getElementById("text").textContent = text;
-  document.getElementById("text").style.color = settings.color;
-  document.getElementById("text").style.fontSize = settings.size + "px";
-
-  document.getElementById("gif").src = settings.gif;
-
+function showAlert(name, amount, settings) {
+  const box = document.getElementById("alert");
+  const text = document.getElementById("text");
+  const gif = document.getElementById("gif");
   const audio = document.getElementById("sound");
+
+  const message = settings.text
+    .replace("{name}", name)
+    .replace("{amount}", amount);
+
+  text.textContent = message;
+  text.style.color = settings.color;
+  text.style.fontSize = settings.size + "px";
+
+  gif.src = settings.gif;
+
   audio.src = settings.sound;
+  audio.currentTime = 0;
   audio.play();
 
-  const box = document.getElementById("alert");
   box.style.display = "block";
-
   setTimeout(() => box.style.display = "none", 6000);
+}
 
-}, 500);
+setInterval(poll, 1500);
 </script>
 
 </body>
