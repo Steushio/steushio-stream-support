@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Steushio Stream Alert</title>
+<title>Alert Overlay</title>
 
 <style>
   body {
@@ -12,75 +12,102 @@
     font-family: Arial, Helvetica, sans-serif;
   }
 
-  #alert {
+  #container {
     position: absolute;
     top: 40%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.8);
-    padding: 24px 36px;
-    background: rgba(0, 0, 0, 0.75);
-    color: #fff;
-    border-radius: 18px;
-    font-size: 28px;
-    font-weight: bold;
-    opacity: 0;
-    transition: all 0.45s ease;
-    box-shadow: 0 0 35px rgba(255,255,255,0.2);
     text-align: center;
-    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.4s ease;
   }
 
-  #alert.show {
+  #container.show {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
+  }
+
+  #gif {
+    max-width: 300px;
+    margin-bottom: 10px;
+  }
+
+  #text {
+    background: rgba(0,0,0,0.7);
+    padding: 16px 26px;
+    border-radius: 16px;
+    font-size: 28px;
+    color: white;
+    font-weight: bold;
   }
 </style>
 </head>
 
 <body>
 
-<div id="alert"></div>
+<div id="container">
+  <img id="gif" src="" style="display:none;">
+  <div id="text"></div>
+</div>
 
-<!-- Alert sound -->
-<audio id="alertSound" src="alert.mp3" preload="auto"></audio>
+<audio id="sound"></audio>
 
 <script>
 let lastEvent = null;
 
-async function pollAlert() {
+function getConfig() {
+  return JSON.parse(localStorage.getItem("alertConfig")) || {
+    text: "❤️ {name} supported the stream",
+    fontSize: 28,
+    color: "#ffffff",
+    sound: "alert.mp3",
+    gif: "",
+    soundEnabled: true
+  };
+}
+
+async function poll() {
   try {
     const res = await fetch("http://localhost:8000/latest");
     const data = await res.json();
 
-    if (!data || !data.name) return;
+    if (!data.name) return;
+    if (JSON.stringify(data) === lastEvent) return;
 
-    const eventKey = JSON.stringify(data);
-    if (eventKey === lastEvent) return;
+    lastEvent = JSON.stringify(data);
+    showAlert(data.name);
+  } catch {}
+}
 
-    lastEvent = eventKey;
-    showAlert(data.name, data.amount);
-  } catch (e) {
-    // silently ignore connection errors
+function showAlert(name) {
+  const cfg = getConfig();
+  const box = document.getElementById("container");
+  const text = document.getElementById("text");
+  const gif = document.getElementById("gif");
+  const sound = document.getElementById("sound");
+
+  text.innerHTML = cfg.text.replace("{name}", name);
+  text.style.fontSize = cfg.fontSize + "px";
+  text.style.color = cfg.color;
+
+  if (cfg.gif) {
+    gif.src = cfg.gif;
+    gif.style.display = "block";
+  } else {
+    gif.style.display = "none";
   }
+
+  if (cfg.soundEnabled && cfg.sound) {
+    sound.src = cfg.sound;
+    sound.currentTime = 0;
+    sound.play();
+  }
+
+  box.classList.add("show");
+  setTimeout(() => box.classList.remove("show"), 5000);
 }
 
-function showAlert(name, amount) {
-  const alertBox = document.getElementById("alert");
-  const sound = document.getElementById("alertSound");
-
-  alertBox.innerHTML = `❤️ <span>${name}</span> supported the stream`;
-  alertBox.classList.add("show");
-
-  sound.currentTime = 0;
-  sound.play();
-
-  setTimeout(() => {
-    alertBox.classList.remove("show");
-  }, 5000);
-}
-
-// check every 2 seconds
-setInterval(pollAlert, 2000);
+setInterval(poll, 2000);
 </script>
 
 </body>
