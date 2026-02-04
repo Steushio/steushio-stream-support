@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Steushio Alert</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: transparent;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    #alertBox {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      padding: 20px 30px;
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+      border-radius: 16px;
+      font-size: 28px;
+      opacity: 0;
+      transition: all 0.4s ease;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255,255,255,0.15);
+    }
+
+    #alertBox.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="alertBox"></div>
+
+  <!-- Sound -->
+  <audio id="alertSound" src="alert.mp3"></audio>
+
+  <script>
+    let lastEvent = null;
+
+    async function checkAlert() {
+      try {
+        const res = await fetch("http://localhost:8000/latest");
+        const data = await res.json();
+
+        if (!data.name) return;
+
+        const key = JSON.stringify(data);
+        if (key === lastEvent) return;
+
+        lastEvent = key;
+        showAlert(data.name, data.amount);
+      } catch (e) {
+        // silently ignore
+      }
+    }
+
+    function showAlert(name, amount) {
+      const box = document.getElementById("alertBox");
+      const sound = document.getElementById("alertSound");
+
+      box.innerHTML = `❤️ <b>${name}</b> supported the stream`;
+      box.classList.add("show");
+
+      sound.currentTime = 0;
+      sound.play();
+
+      setTimeout(() => {
+        box.classList.remove("show");
+      }, 5000);
+    }
+
+    setInterval(checkAlert, 2000);
+  </script>
+
+</body>
+</html>
