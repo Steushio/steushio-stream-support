@@ -9,7 +9,7 @@ body {
   margin:0;
   background:transparent;
   overflow:hidden;
-  font-family:Arial, sans-serif;
+  font-family:Arial;
 }
 #alert {
   display:none;
@@ -20,11 +20,6 @@ body {
 }
 #alert img {
   max-width:200px;
-}
-#text {
-  font-size:28px;
-  color:white;
-  font-weight:bold;
 }
 </style>
 </head>
@@ -39,64 +34,37 @@ body {
 <audio id="sound"></audio>
 
 <script>
-let lastId = null;
+setInterval(() => {
+  const trigger = localStorage.getItem("triggerAlert");
+  if (!trigger) return;
 
-async function poll() {
-  try {
-    const controller = new AbortController();
-    setTimeout(() => controller.abort(), 1000);
+  localStorage.removeItem("triggerAlert");
 
-    const res = await fetch("http://192.168.1.2:8000/latest", {
-      signal: controller.signal
-    });
+  const data = JSON.parse(trigger);
+  const settings = JSON.parse(localStorage.getItem("alertSettings"));
 
-    const data = await res.json();
-    if (!data || !data.name) return;
+  if (!settings) return;
 
-    if (data.id === lastId) return;
-    lastId = data.id;
+  const text = settings.text
+    .replace("{name}", data.name)
+    .replace("{amount}", data.amount);
 
-    showAlert(data.name, data.amount, data.settings);
-  } catch (e) {
-    // silent fail (server offline etc.)
-  }
-}
+  document.getElementById("text").textContent = text;
+  document.getElementById("text").style.color = settings.color;
+  document.getElementById("text").style.fontSize = settings.size + "px";
 
-function showAlert(name, amount, settings) {
+  document.getElementById("gif").src = settings.gif;
 
-  settings = settings || {
-    text: "❤️ {name} supported ₹{amount}",
-    color: "#ffffff",
-    size: 28,
-    gif: "",
-    sound: ""
-  };
+  const audio = document.getElementById("sound");
+  audio.src = settings.sound;
+  audio.play();
 
   const box = document.getElementById("alert");
-  const text = document.getElementById("text");
-  const gif = document.getElementById("gif");
-  const audio = document.getElementById("sound");
-
-  const message = settings.text
-    .replace("{name}", name)
-    .replace("{amount}", amount);
-
-  text.textContent = message;
-  text.style.color = settings.color;
-  text.style.fontSize = settings.size + "px";
-
-  gif.src = settings.gif || "";
-  audio.src = settings.sound || "";
-  audio.currentTime = 0;
-  audio.play().catch(() => {});
-
   box.style.display = "block";
-  setTimeout(() => {
-    box.style.display = "none";
-  }, 6000);
-}
 
-setInterval(poll, 1500);
+  setTimeout(() => box.style.display = "none", 6000);
+
+}, 500);
 </script>
 
 </body>
